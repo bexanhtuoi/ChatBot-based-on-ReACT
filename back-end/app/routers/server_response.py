@@ -1,8 +1,9 @@
 from ..models.response import Response
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 import json
 import os
 from dotenv import load_dotenv
+from datetime import datetime
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.tools import Tool
 from langchain.agents import create_react_agent, AgentExecutor
@@ -61,7 +62,7 @@ agent_executor = AgentExecutor(agent=agent,
                                tools=tools,
                                handle_parsing_errors=True,
                                max_iterations=10,
-                               max_execution_time=60,
+                               max_execution_time=120,
                                memory=memory
                                )
 
@@ -73,16 +74,14 @@ async def get_response():
         if loaded != []:
             data = loaded[-1]
         else:
-            data = {
-                "text": "xin chào bạn" ,
-                "timestamp": "2023-10-01T12:00:00"
-            }
+            raise HTTPException(status_code=404, detail="No data found")
 
-    mes = Response(text=data["text"], timestamp=data["timestamp"])
+    mes = Response(text=data["text"],
+                    timestamp=data["timestamp"])
     loop = asyncio.get_running_loop()
     with ThreadPoolExecutor() as pool:
         responsive = await loop.run_in_executor(pool, agent_executor.invoke, {"input": mes.text})
-    return {
+    return {"status_code": 200,
         "message": "Response retrieved successfully",
         "data": responsive
     }

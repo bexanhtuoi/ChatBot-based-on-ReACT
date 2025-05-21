@@ -80,7 +80,7 @@ function App() {
     } catch (err) {
       setMessages((prev) => [
         ...prev,
-        { role: 'assistant', content: 'Opps!! Somethings wrong' }
+        { role: 'assistant', content: 'Opps!! Somethings wrong :))' }
       ]);
     } finally {
       setIsAITyping(false);
