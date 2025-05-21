@@ -69,7 +69,7 @@ agent_executor = AgentExecutor(agent=agent,
 @router.get("/response")
 async def get_response():
     data_path = os.path.join(os.path.dirname(__file__), "data.json")
-    with open(data_path, 'r') as f:
+    with open(data_path, 'r', encoding='utf-8') as f:
         loaded = json.load(f)
         if loaded != []:
             data = loaded[-1]
