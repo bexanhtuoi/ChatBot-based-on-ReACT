@@ -62,13 +62,14 @@ function App() {
     setMessages((prev) => [...prev, userMessage]);
     setInput('');
     setIsAITyping(true);
-
     try {
+
+      const formData = new FormData();
+      formData.append('chat', input);
       // Gửi POST lên backend
       await fetch('http://localhost:8000/api/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({ chat: input })
+        body: formData
       });
       // Fetch kết quả trả về từ backend
       const res = await fetch('http://localhost:8000/api/response');
