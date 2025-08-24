@@ -8,3 +8,8 @@ langchain_community
 langchain
 langchain-google-genai
 PyPDF2
+pydantic
+pymongo[srv]==3.12
+pydantic-settings
+PyJWT
+passlib
