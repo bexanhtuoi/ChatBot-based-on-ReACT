@@ -10,7 +10,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
 
-def iUserExists(username: str, email: str) -> bool:
+def isUserExists(username: str, email: str) -> bool:
     if users_collection.find_one({"$or": [{"username": username}, {"email": email}]}):
         return True
     return False

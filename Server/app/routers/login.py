@@ -27,7 +27,9 @@ def authenticate_user(username: str, password: str):
     return User(**user)
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
-    to_encode = data.copy()
+    user_data = data.copy()
+    to_encode = {"sub": "ok"}
+    to_encode.update({"user": user_data})
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
     else:
@@ -47,7 +49,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
         )
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": {"user_id": user.id, "user_name": user.username}}, expires_delta=access_token_expires
+        data={"user_id": user.id, "user_name": user.username}, expires_delta=access_token_expires
     )
     response = JSONResponse(content={"message": "Login successful"})
     response.set_cookie(key="access_token",

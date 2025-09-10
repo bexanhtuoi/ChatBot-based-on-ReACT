@@ -20,12 +20,11 @@ from langchain.memory import ConversationBufferMemory
 
 # Other imports
 import asyncio
-from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
+from uuid import uuid4
 
 router = APIRouter(prefix="/api", tags=["chat"])
 
-executor = ThreadPoolExecutor()
 
 llm = ChatGoogleGenerativeAI(
     model="gemini-2.0-flash-lite",
@@ -79,26 +78,30 @@ def save_chat_to_db(user_id: str, id_chat: str, message: str, response: str):
     ]
     try:
         result = chat_collection.update_one(
-        {"user_id": user_id, "all_chat.id_chat": id_chat},
-        {"$push": {"all_chat.$.messages": {"$each": new_messages}}}  
+            {"user_id": user_id, "all_chat.id_chat": id_chat},
+            {"$push": {"all_chat.$.messages": {"$each": new_messages}}}
         )
+
         if result.matched_count == 0:
+            # Nếu chat chưa tồn tại, tạo mới
             chat_collection.update_one(
                 {"user_id": user_id},
                 {"$push": {"all_chat": {"id_chat": id_chat, "messages": new_messages}}},
                 upsert=True
             )
+        return True
     except Exception as e:
         print(f"An error occurred while saving chat to DB: {str(e)}")
+        return False
 
 @router.post("/chat")
-async def chat(message: str, id_chat: str, current_user: dict = Depends(authenticate_user)):
-    user_id = current_user.get("user_id")
+async def chat(message: str, id_chat: str = str(uuid4), current_user: dict = Depends(authenticate_user)):
+    user = current_user
+    user_id = user.get("user_id")
     try:
-        loop = asyncio.get_running_loop()
-        responsive = await loop.run_in_executor(executor, agent_executor.invoke, {"input": message})
+        responsive =  await asyncio.to_thread(agent_executor.invoke, {"input": message})
         response_text = responsive['output']
-        await loop.run_in_executor(executor, save_chat_to_db, user_id, id_chat, message, response_text)
+        Is_saved = await asyncio.to_thread(save_chat_to_db, user_id, id_chat, message, response_text)
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
