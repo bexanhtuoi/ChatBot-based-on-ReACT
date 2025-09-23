@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🤖Chatbot</title>
+    <link rel="stylesheet" href="../styles/chatroom.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background-color: #ffffff;
+        }
+        header {
+            background-color: #ffffff;
+            color: white;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ccc;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        #logo {
+            height: 40px;
+            border-radius: 50%;
+            
+        }
+        #logout {
+            background-color: #ffffff;
+            border: none;
+            color: white;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+        }
+        #logout img {
+            width: 30px;
+            height: 30px;
+        }
+        main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            padding: 0px 20px;
+        }
+        #sidebar {
+            width: 250px;
+            border-right: 1px solid #ccc;
+            padding-right: 10px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        #chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border-radius: 5px;
+            height: 100%;
+
+        }
+        #chat-box {
+            flex: 1;
+            padding: 10px;
+            overflow-y: scroll;
+
+        }
+        #chat-box::-webkit-scrollbar {
+            display: none;           
+        }
+
+        #chat-form {
+            display: flex;
+            padding: 10px;
+        }
+        #user-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 85%;
+        }
+        #chat-form button {
+            background-color: #571f57;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            margin-left: 10px;
+            cursor: pointer;
+            width: 15%;
+        }
+        .message {
+            margin-bottom: 10px;
+        }
+        .user-message {
+            text-align: right;
+            color: blue;
+        }
+        .bot-message {
+            text-align: left;
+            color: green;
+        }
+
+        @media (max-width: 850px) {
+            #chat-container {
+                width: 100%;
+            }
+            #sidebar {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img id="logo" src="https://img.icons8.com/?size=100&id=48282&format=png&color=000000" alt="">
+        <button id="logout">
+            <img src="https://img.icons8.com/?size=100&id=rupFD7sZ58qx&format=png&color=000000" alt="">
+        </button>
+    </header>
+    <main>
+        <nav id="sidebar">
+            <button id="new-chat"></button>
+            <ul id="chat-list"></ul>
+
+        </nav>
+        <div id="chat-container">
+            <div id="chat-box">
+            </div>
+            <form id="chat-form">
+                <input type="text" id="user-input" placeholder="Type your message..." required>
+                <button id="submit" type="submit">Send</button>
+            </form>
+        </div>
+    <script src="../script/chat.js"></script>
+</body>
+</html>
