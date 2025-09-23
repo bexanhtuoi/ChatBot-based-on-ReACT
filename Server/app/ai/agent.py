@@ -35,7 +35,7 @@ class Agent(RAG):
                                    tools=self.tools,
                                    prompt=self._get_prompt())
 
-        self.agent_executor = AgentExecutor(agent=agent,
+        self.agent_executor = AgentExecutor(agent=self.agent,
                                        tools=self.tools,
                                        handle_parsing_errors=True,
                                        max_iterations=10,
@@ -60,4 +60,4 @@ class Agent(RAG):
 
     async def invoke(self, question: str, chat_history: List[Union[HumanMessage, AIMessage]] = []):
         memory = self._get_memory(chat_history)
-        return await agent_executor.ainvoke({"input": question, "chat_history": memory})
+        return await self.agent_executor.ainvoke({"input": question, "chat_history": memory})

@@ -1,16 +1,18 @@
 from pydantic import BaseModel, Field
-from typing import Optional, List
+from typing import Optional, List, Union
 from uuid import uuid4, UUID
+from langchain_core.messages import HumanMessage, AIMessage
+
 
 
 class ChatBase(BaseModel):
-    user_id: UUID
+    user_id: str
     id: UUID = Field(default_factory=lambda: str(uuid4()))
-    conversation: List[Optional[str]] = []
+    conversation: List[Union[HumanMessage, AIMessage]] = []
     created_at: Optional[str] = None
     updated_at: Optional[str] = None
     is_pro: bool = False
-    is_private: bool = True
+    is_private: bool = False
 
 class SendMessage(BaseModel):
     id_chat: UUID

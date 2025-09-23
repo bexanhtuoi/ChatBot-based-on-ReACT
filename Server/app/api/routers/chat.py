@@ -76,11 +76,12 @@ def delete_chat(chat_id: str, id_user: str = Depends(get_token)):
     return {"message": f"Chat with id {chat_id} deleted successfully."}
 
 @router.post(
-    "/", response_model=ChatBase, status_code=status.HTTP_201_CREATED
+    "/", response_model=dict, status_code=status.HTTP_201_CREATED
 )
 async def send_chat(chat: SendMessage, id_user: str = Depends(get_token)):
-    chat = chat_crud.get_one(chat.id)
-    if not chat:
+    chat_data = chat_crud.get_one(chat.id_chat)
+    print(chat_data)
+    if not chat_data:
         chat_data = chat.model_dump()
 
         message = HumanMessage(content=chat_data["message"])
@@ -90,20 +91,20 @@ async def send_chat(chat: SendMessage, id_user: str = Depends(get_token)):
         chat_in_db = ChatBase(
             conversation=conversation,
             user_id=id_user,
-            day_created=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            created_at=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
 
         )
         chat_crud.create_one(chat_in_db)
         return {"message": "Chat created successfully", "response": response["output"]}
     
-    if chat.user_id != id_user:
+    if chat_data.user_id != id_user:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Operation not permitted"
         )
     message = HumanMessage(content=chat.message)
     history = []
-    for msg in chat_id.conversation:
+    for msg in chat_data.conversation:
         if msg is not None:
             if "AI:" in msg:
                 history.append(AIMessage(content=msg.replace("AI: ", "")))
@@ -111,10 +112,11 @@ async def send_chat(chat: SendMessage, id_user: str = Depends(get_token)):
                 history.append(HumanMessage(content=msg.replace("Human: ", "")))
 
     response = await agent.invoke(chat.message, history)
-    chat.conversation.append(message)
-    chat.conversation.append(AIMessage(content=response["output"]))
-    chat.updated_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    chat_crud.update(chat.id, chat)
+
+    chat_data.conversation.append(message)
+    chat_data.conversation.append(AIMessage(content=response["output"]))
+    chat_data.updated_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    chat_crud.update(chat_data.id, chat_data)
     return {"message": "Chat updated successfully", "response": response["output"]}
 
 @router.put(
