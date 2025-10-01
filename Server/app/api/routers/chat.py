@@ -80,7 +80,7 @@ def delete_chat(chat_id: str, id_user: str = Depends(get_token)):
 )
 async def send_chat(chat: SendMessage, id_user: str = Depends(get_token)):
     chat_data = chat_crud.get_one(chat.id_chat)
-    print(chat_data)
+
     if not chat_data:
         chat_data = chat.model_dump()
 

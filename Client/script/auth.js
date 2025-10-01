@@ -28,11 +28,12 @@ if (registerForm) {
             return;
         }
 
+
         try {
             const response = await fetch("http://localhost:8000/auth/register", {
                 method: "POST",
-                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: new URLSearchParams({
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
                     email: email,
                     full_name: fullName,
                     password: password
@@ -73,7 +74,8 @@ if (loginForm) {
                     body: new URLSearchParams({
                         username: email, 
                         password: password
-                    })
+                    }),
+                    credentials: "include" 
                 }),
                 fetch(`http://localhost:8000/users/e/${email}`)
             ]);

@@ -15,7 +15,7 @@ class ChatBase(BaseModel):
     is_private: bool = False
 
 class SendMessage(BaseModel):
-    id_chat: UUID
+    id_chat: str
     message: str
 
 class ChatUpdate(BaseModel):

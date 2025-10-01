@@ -5,6 +5,7 @@ from app.api import (
     chat_router
 )
 from fastapi.middleware.cors import CORSMiddleware
+from app.core.config import settings
 
 app = FastAPI(
     title="Chatbot API",
@@ -14,7 +15,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], 
+    allow_origins=["http://localhost:3000"], 
     allow_credentials=True,
     allow_methods=["*"], 
     allow_headers=["*"], 
