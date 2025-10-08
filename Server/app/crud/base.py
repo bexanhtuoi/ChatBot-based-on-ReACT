@@ -35,4 +35,6 @@ class CRUDRepository():
             del update_data["password"]
 
         if update_data:
+            print("Đây là data: ", update_data)
             self.collection.update_one({"id": obj_id}, {"$set": update_data})
+            print("đã update")

@@ -7,7 +7,12 @@ from langchain_chroma import Chroma
 
 
 class RAG:
-  def __init__(self, model_embedding: str = "sentence-transformers/all-MiniLM-L6-v2", folder_path: str = None):
+  def __init__(self,
+                model_embedding: str = "sentence-transformers/all-MiniLM-L6-v2",
+                  folder_path: str = None,
+                  persist_directory: str = "app/database"):
+
+    self.persist_directory = persist_directory
 
     self.model_embedding = HuggingFaceEmbeddings(
     model_name=model_embedding,
@@ -17,19 +22,28 @@ class RAG:
 
     self.folder_path = folder_path
 
-    self.documents = self.load_document()
+    if os.path.exists(os.path.join(persist_directory, "chroma.sqlite3")):
+        print("🔁 Đang tải lại vector database từ app/database ...")
+        self.vectorstores = Chroma(
+            persist_directory=self.persist_directory,
+            embedding_function=self.model_embedding
+        )
+    else:
+        print("🆕 Chưa có database, đang tạo mới...")
+        self.documents = self.load_document()
 
-    self.text_splitter = RecursiveCharacterTextSplitter(
-    chunk_size=1200,
-    chunk_overlap=200,
-    )
-    self.all_splits = self.text_splitter.split_documents(self.documents)
+        self.text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=1200,
+            chunk_overlap=200,
+        )
+        self.all_splits = self.text_splitter.split_documents(self.documents)
 
-
-    self.vectorstores = Chroma.from_documents(
-    documents=self.all_splits,
-    embedding=self.model_embedding
-    )
+        self.vectorstores = Chroma.from_documents(
+            documents=self.all_splits,
+            embedding=self.model_embedding,
+            persist_directory=self.persist_directory
+        )
+        print(f"✅ Đã lưu vector database tại: {self.persist_directory}")
 
   def load_document(self):
     documents = []

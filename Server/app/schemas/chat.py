@@ -7,7 +7,7 @@ from langchain_core.messages import HumanMessage, AIMessage
 
 class ChatBase(BaseModel):
     user_id: str
-    id: UUID = Field(default_factory=lambda: str(uuid4()))
+    id: str = Field(default_factory=lambda: str(uuid4()))
     conversation: List[Union[HumanMessage, AIMessage]] = []
     created_at: Optional[str] = None
     updated_at: Optional[str] = None

@@ -16,17 +16,22 @@
 
 ## Hướng dẫn cài đặt và chạy dự án
 
+
 1. **Clone dự án**
 
 ```bash
-# Clone về máy
-https://github.com/bexanhtuoi/ChatBot-based-on-ReACT.git
+git clone https://github.com/bexanhtuoi/ChatBot-based-on-ReACT.git
 ```
 
-2. **Cài đặt các thư viện cần thiết**
+2. **Cài đặt các thư viện cần thiết và kích hoạt môi trường ảo**
+
+Khuyến nghị sử dụng môi trường ảo để quản lý các package Python:
 
 ```bash
-cd Server
+cd ChatBot-based-on-ReACT/Server
+python -m venv venv
+venv\Scripts\activate  # Windows
+# source venv/bin/activate  # macOS/Linux
 pip install -r requirements.txt
 ```
 
@@ -37,6 +42,17 @@ uvicorn app.main:app --reload
 ```
 
 Server sẽ chạy tại địa chỉ: `http://127.0.0.1:8000`
+
+4. **Chạy Frontend (HTML/CSS/JS) bằng Python trên cổng 3000**
+
+Frontend nằm trong thư mục `Client`, sử dụng HTML, CSS, JS thuần. Để chạy trên cổng 3000, bạn có thể dùng server tĩnh của Python:
+
+```bash
+cd ChatBot-based-on-ReACT/Client
+python -m http.server 3000
+```
+
+Sau đó truy cập: `http://localhost:3000/pages/login.html`
 
 ## Chi tiết các endpoint
 

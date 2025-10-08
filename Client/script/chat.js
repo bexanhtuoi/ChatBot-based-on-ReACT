@@ -13,7 +13,9 @@ function generateUUID() {
     });
 }
 
-let current_chat_id = generateUUID();
+let uuid = generateUUID();
+
+let current_chat_id = uuid;
 
 new_chat.addEventListener('click', function () {
             current_chat_id = generateUUID();
