@@ -6,6 +6,7 @@ from app.api.dependencies import get_pagination_params, get_token
 from datetime import datetime, timedelta
 from app.ai.agent import Agent
 from langchain_core.messages import HumanMessage, AIMessage
+from uuid import uuid4, UUID
 
 router = APIRouter()
 agent = Agent()
@@ -76,12 +77,13 @@ def delete_chat(chat_id: str, id_user: str = Depends(get_token)):
     return {"message": f"Chat with id {chat_id} deleted successfully."}
 
 @router.post(
-    "/", response_model=dict, status_code=status.HTTP_201_CREATED
+    "/{chat_id}", response_model=dict, status_code=status.HTTP_201_CREATED
 )
-async def send_chat(chat: SendMessage, id_user: str = Depends(get_token)):
-    chat_data = chat_crud.get_one(chat.id_chat)
+async def send_chat(chat: SendMessage, chat_id: str, id_user: str = Depends(get_token)):
+    chat_data = chat_crud.get_one(chat_id)
 
     if not chat_data:
+        chat_id = str(uuid4())
         chat_data = chat.model_dump()
 
         message = HumanMessage(content=chat_data["message"])
@@ -89,13 +91,14 @@ async def send_chat(chat: SendMessage, id_user: str = Depends(get_token)):
         conversation = [message, AIMessage(content=response["output"])]
 
         chat_in_db = ChatBase(
+            id=chat_id,
             conversation=conversation,
             user_id=id_user,
             created_at=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
 
         )
         chat_crud.create_one(chat_in_db)
-        return {"message": "Chat created successfully", "response": response["output"]}
+        return {"chat_id": chat_id, "response": response["output"]}
     
     if chat_data.user_id != id_user:
         raise HTTPException(
@@ -106,10 +109,10 @@ async def send_chat(chat: SendMessage, id_user: str = Depends(get_token)):
     history = []
     for msg in chat_data.conversation:
         if msg is not None:
-            if "AI:" in msg:
-                history.append(AIMessage(content=msg.replace("AI: ", "")))
-            elif "Human:" in msg:
-                history.append(HumanMessage(content=msg.replace("Human: ", "")))
+            if isinstance(msg, AIMessage):
+                history.append(AIMessage(content=msg.content))
+            elif isinstance(msg, HumanMessage):
+                history.append(HumanMessage(content=msg.content))
 
     response = await agent.invoke(chat.message, history)
 
@@ -117,7 +120,7 @@ async def send_chat(chat: SendMessage, id_user: str = Depends(get_token)):
     chat_data.conversation.append(AIMessage(content=response["output"]))
     chat_data.updated_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     chat_crud.update(chat_data.id, chat_data)
-    return {"message": "Chat updated successfully", "response": response["output"]}
+    return {"chat_id": chat_data.id, "response": response["output"]}
 
 @router.put(
     "/{chat_id}", response_model=ChatBase, status_code=status.HTTP_200_OK

@@ -1,7 +1,7 @@
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.tools import Tool
 from langchain.agents import create_react_agent, AgentExecutor
-from langchain.tools.tavily_search import TavilySearchResults
+from langchain_tavily import TavilySearch
 from langchain_core.prompts import PromptTemplate
 from langchain_core.messages import HumanMessage, AIMessage
 from app.ai.rag import RAG
@@ -23,7 +23,7 @@ class Agent(RAG):
         )
         self.search_tool = Tool(
             name="Tavily Search",
-            func=TavilySearchResults(k=k, api_key=settings.tavily_api_key),
+            func=TavilySearch(k=k, api_key=settings.tavily_api_key),
             description="Tìm kiếm thông tin thời gian thực từ internet như thời tiết, giá vàng, tin tức."
         )
         self.tools = [
