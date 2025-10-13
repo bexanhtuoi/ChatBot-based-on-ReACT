@@ -6,6 +6,11 @@
     <title>🤖Chatbot</title>
     <link rel="stylesheet" href="../styles/chatroom.css">
     <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -47,6 +52,7 @@
             display: flex;
             align-items: center;
             padding: 0px 20px;
+            height: 80%;
         }
         #sidebar {
             width: 250px;
@@ -58,19 +64,20 @@
             
         }
         #chat-container {
-            flex: 1;
+            flex: 1 1 auto;
             display: flex;
             flex-direction: column;
             border-radius: 5px;
             height: 100%;
-
+            min-height: 0;
         }
         #chat-box {
-            flex: 1;
+            flex: 1 1 auto;
             padding: 10px;
-            overflow-y: scroll;
-
+            overflow-y: auto;
+            min-height: 0;
         }
+        
         #chat-box::-webkit-scrollbar {
             display: none;           
         }
@@ -78,6 +85,7 @@
         #chat-form {
             display: flex;
             padding: 10px;
+            flex-shrink: 0;
         }
         #user-input {
             flex: 1;
@@ -224,5 +232,18 @@
             </form>
         </div>
     <script src="../script/chat.js"></script>
+    <script>
+    // Auto-scroll chat-box when a new message is added
+    function scrollChatToBottom() {
+        var chatBox = document.getElementById('chat-box');
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+    // Observe changes in chat-box
+    const chatBox = document.getElementById('chat-box');
+    if (chatBox) {
+        const observer = new MutationObserver(scrollChatToBottom);
+        observer.observe(chatBox, { childList: true });
+    }
+    </script>
 </body>
 </html>

@@ -6,24 +6,28 @@ const log_out = document.getElementById("logout");
 
 
 const user = JSON.parse(localStorage.getItem("user"));
-function generateUUID() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-    });
-}
 
-let uuid = generateUUID();
+let uuid = "make new";
 
 let current_chat_id = uuid;
 
+chatbox.innerHTML = "";
+const h1 = document.createElement("h1");
+h1.textContent = "Hi there! How can I assist you today?";
+h1.style.textAlign = "center";
+chatbox.appendChild(h1);
+
 new_chat.addEventListener('click', function () {
-            current_chat_id = generateUUID();
+            current_chat_id = uuid;
             chatbox.innerHTML = "";
+            const h1 = document.createElement("h1");
+            h1.textContent = "Hi there! How can I assist you today?";
+            h1.style.textAlign = "center";
+            chatbox.appendChild(h1);
         });
 
 const getAllChatFromUserID = async (id_user) => {
-    const response = await fetch(`http://localhost:8000/chats/u/${id_user}`, {
+    const response = await fetch(`http://localhost:8000/c/u/${id_user}`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
         credentials: "include"
@@ -46,7 +50,7 @@ const getAllChatFromUserID = async (id_user) => {
 };
 
 const getConversationFromChatID = async (id_chat) => {
-    const response = await fetch(`http://localhost:8000/chats/${id_chat}`,
+    const response = await fetch(`http://localhost:8000/c/${id_chat}`,
         {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
@@ -62,29 +66,41 @@ const getConversationFromChatID = async (id_chat) => {
 };
 
 const getResponse = async (id_chat, message) => {
-    const body = { id_chat: id_chat, message: message };
-    const response = await fetch('http://localhost:8000/chats', {
+    const body = { message: message };
+    const response = await fetch(`http://localhost:8000/c/${id_chat}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
         credentials: "include"
     });
     const data = await response.json();
-    return data.response;
+    return data;
 };
 
 if (submit) {
     submit.addEventListener('click', async function () {
-        const message = document.getElementById('user-input').value;
+        if (current_chat_id === uuid) {
+            chatbox.innerHTML = "";
+        }
+        const messageInput = document.getElementById('user-input');
+        const message = messageInput.value;
         if (!message || !current_chat_id) return;
-        console.log(current_chat_id)
+        submit.disabled = true;
+        messageInput.disabled = true;
         const userMessage = `<div class="user-message">${message}</div>`;
         chatbox.innerHTML += userMessage;
-        document.getElementById('user-input').value = '';
+        messageInput.value = '';
 
-        const botResponse = await getResponse(current_chat_id, message);
-        const botMessage = `<div class="bot-message">${botResponse}</div>`;
+        const data = await getResponse(current_chat_id, message);
+        if (current_chat_id === uuid) {
+            current_chat_id = data.chat_id;
+            getAllChatFromUserID(user.id);
+        }
+        const botMessage = `<div class="bot-message">${data.response}</div>`;
         chatbox.innerHTML += botMessage;
+        submit.disabled = false;
+        messageInput.disabled = false;
+        messageInput.focus();
     });
 }
 
